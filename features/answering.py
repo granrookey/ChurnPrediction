@@ -46,3 +46,9 @@ def getFirstPostTypeIsAnswer(posts):
 def getTotalNumOfComments(tqna):
     tqna['total_comment'] = tqna.CommentCountA + tqna.CommentCountQ / tqna.AnswerCount
     return tqna.groupby('QuestionUserId').total_comment.sum()
+
+# Competitiveness features 1: answer speed rank
+def getAnsSpeedRank(users, answers, questions, qnta, tqna):
+    tmp_rank = answers.groupby('ParentId')['CreationDate'].rank(method='first')
+    answers_rank = questions.set_index('Id').join(tmp_rank, how='inner', rsuffix='R')
+    return answers_rank.groupby('OwnerUserId')['CreationDateR'].mean()
